@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mushroom Classification Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f8;
+            margin: 0;
+            padding: 20px;
+        }.container {
+            background-color: #fff;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 95%;
+            max-width: 1200px;
+        }        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            font-size: 1.1em;
+        }
+
+        form p {
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result, .error {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .error {
+            color: red;
+        }        .results-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .metrics-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .chart {
+            margin-top: 20px;
+            text-align: center;
+        }        .chart h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.2em;
+        }
+
+        .data-info {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }        .data-info h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .data-info h4 {
+            font-size: 1.4em;
+            margin-top: 20px;
+        }        .data-info pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        .data-stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .data-stats-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .data-stats-card h4 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            font-size: 1.4em;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .data-stats-card pre {
+            margin: 0;
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+
+        .category-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin: 10px 0 20px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #007bff;
+            border-radius: 0 4px 4px 0;
+        }        .feature-sections {
+            margin: 20px 0;
+        }
+
+        .feature-section {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }        .feature-section h5 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+            font-size: 1.4em;
+        }
+
+        .key-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }        .stat-label {
+            display: block;
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .feature-details {
+            display: grid;
+            gap: 15px;
+        }        .feature-item {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .feature-item strong {
+            color: #2c3e50;
+            margin-right: 5px;
+        }
+
+        .feature-guide {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .feature-guide h5 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .feature-guide ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .feature-guide ul ul {
+            padding-left: 20px;
+            margin: 5px 0 15px 0;
+        }
+
+        .feature-guide li {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .feature-guide ul ul li {
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .feature-guide strong {
+            color: #2c3e50;
+        }
+
+        .category-counts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .category-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .chart-item.full-width {
+            grid-column: 1 / -1;
+            margin-top: 30px;
+        }
+
+        .chart-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .chart-item h4 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            text-align: left;
+        }
+
+        .chart img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .chart img:hover {
+            transform: scale(1.02);
+        }
+
+        .chart-conclusion {
+            margin: 15px 0 0 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            color: #2c3e50;
+            font-size: 1.1em;
+            line-height: 1.4;
+            text-align: left;
+            border-left: 3px solid #007bff;
+        }.classification-report {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }        .classification-report pre {
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            margin: 0;
+            font-size: 16px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+            line-height: 1.6;
+        }
+
+        .classification-report h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .metrics-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .metric-card h4 {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .metric-card .value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .model-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .model-info h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }        .model-info p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .interpretation {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .interpretation h4 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .class-details {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .class-details h5 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            font-size: 1.1em;
+        }
+
+        .class-details ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .class-details li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .class-details li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #007bff;
+        }
+
+        .class-details strong {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>    <div class="container">
+        <h2>Upload Dataset & Run ML Algorithm</h2>        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Run</button>
+        </form>
+
+        {% if result %}
+            <div class="results-container">                <div class="metrics-card">
+                    <div class="model-info">
+                        <h4>Model Information</h4>
+                        <p>Algorithm: Logistic Regression<br>
+                        Test Split: 20%<br>
+                        Random State: 42</p>
+                    </div>
+
+                    <h3>Model Performance</h3>
+                    <div class="metrics-summary">
+                        <div class="metric-card">
+                            <h4>Accuracy</h4>
+                            <div class="value">{{ result }}</div>
+                        </div>
+                    </div>
+                      {% if classification_report %}
+                        <div class="classification-report">
+                            <h3>Classification Report</h3>
+                            <pre>{{ classification_report }}</pre>
+                            
+                            <div class="interpretation">
+                                <h4>🧠 Class-wise Interpretation:</h4>
+                                
+                                <div class="class-details">
+                                    <h5>🍄 Edible Mushrooms:</h5>
+                                    <ul>
+                                        <li><strong>Precision: 0.66</strong> → Out of all mushrooms predicted as edible, 66% were actually edible.</li>
+                                        <li><strong>Recall: 0.60</strong> → The model correctly identified 60% of all truly edible mushrooms.</li>
+                                        <li><strong>F1-score: 0.63</strong> → A balance of precision and recall for edible class.</li>
+                                        <li><strong>Support: 5374</strong> → There were 5374 actual edible mushrooms in the test data.</li>
+                                    </ul>
+                                </div>
+                              </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if data_info %}
+        <div class="data-info">
+            <h3>Dataset Information</h3>
+            <h4>Data Shape</h4>
+            <pre>{{ data_info.shape }}</pre>
+              <div class="data-stats-container">
+                <div class="data-stats-card">
+                    <h4>Data Types</h4>
+                    <pre>{{ data_info.dtypes }}</pre>
+                </div>
+                
+                <div class="data-stats-card">
+                    <h4>Statistical Description</h4>
+                    {{ data_info.description|safe }}
+                </div>
+            </div><h4>Category-wise Counts</h4>
+            <p class="category-description">
+                Distribution of values in each categorical feature, showing how many mushrooms have each characteristic.
+                Understanding these distributions helps identify common and rare mushroom features.
+            </p>
+            
+            <div class="feature-sections">
+                <div class="feature-section">
+                    <h5>🎯 Key Numbers:</h5>
+                    <div class="key-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Poisonous:</span>
+                            <span class="stat-value">33,888</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Edible:</span>
+                            <span class="stat-value">27,181</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-section">
+                    <h5>🍄 Cap Features:</h5>
+                    <div class="feature-details">
+                        <div class="feature-item">
+                            <strong>Shape:</strong> Most common is convex (26,934), followed by flat (13,404), with conical being least common (1,815)
+                        </div>
+                        <div class="feature-item">
+                            <strong>Surface:</strong> Predominantly sticky (8,196) and smooth (7,608), with leathery being least common (1,412)
+                        </div>
+                        <div class="feature-item">
+                            <strong>Color:</strong> Mostly brown (24,218), with yellow (8,543) and white (7,666) following. Blue is least common (828)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-section">
+                    <h5>🌟 Important Identifiers:</h5>
+                    <div class="feature-details">
+                        <div class="feature-item">
+                            <strong>Bruising:</strong> Most mushrooms don't bruise/bleed (50,479 vs 10,590)
+                        </div>
+                        <div class="feature-item">
+                            <strong>Ring Type:</strong> Many have no ring (48,361), with various ring types in smaller numbers
+                        </div>
+                        <div class="feature-item">
+                            <strong>Habitat:</strong> Predominantly found in woods (44,209), followed by grasses (7,943)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-guide">
+                <h5>🔍 Quick Guide for Non-Biology Folks:</h5>
+                <ul>
+                    <li><strong>Cap:</strong> The umbrella-like top part
+                        <ul>
+                            <li>Shape: Ranges from flat like a plate to convex like an umbrella</li>
+                            <li>Surface: Can be smooth, sticky, or have patterns</li>
+                            <li>Color: Most common is brown, but can vary widely</li>
+                        </ul>
+                    </li>
+                    <li><strong>Safety Indicators:</strong>
+                        <ul>
+                            <li>Bruising/Bleeding: Color changes when touched</li>
+                            <li>Ring: A skirt-like structure on the stem</li>
+                            <li>Habitat: Where you typically find them</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="category-counts">
+                {% for column, counts in data_info.category_counts.items %}
+                <div class="category-item">
+                    <h5>{{ column }}</h5>
+                    <pre>{% for value, count in counts.items %}{{ value }}: {{ count }}
+{% endfor %}</pre>
+                </div>
+                {% endfor %}            </div>
+        </div>
+        {% endif %}        {% if chart_urls %}
+            <div class="chart-container">
+                <h2>Mushroom Analysis Visualizations</h2>
+                
+                <div class="chart-grid">
+                    {% if chart_urls.dist_cap_diameter %}
+                    <div class="chart-item">
+                        <h4>Cap Diameter Distribution</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.dist_cap_diameter }}" alt="Cap Diameter Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.dist_cap_diameter }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if chart_urls.dist_stem_height %}
+                    <div class="chart-item">
+                        <h4>Stem Height Distribution</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.dist_stem_height }}" alt="Stem Height Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.dist_stem_height }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if chart_urls.dist_stem_width %}
+                    <div class="chart-item">
+                        <h4>Stem Width Distribution</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.dist_stem_width }}" alt="Stem Width Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.dist_stem_width }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if chart_urls.feature_importance %}
+                    <div class="chart-item">
+                        <h4>Feature Importance</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.feature_importance }}" alt="Feature Importance">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.feature_importance }}</p>
+                    </div>                    {% endif %}
+
+                    {% if chart_urls.class_distribution %}
+                    <div class="chart-item">
+                        <h4>Class Distribution</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.class_distribution }}" alt="Class Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.class_distribution }}</p>
+                    </div>
+                    {% endif %}                    {% if chart_urls.scatter_plot %}
+                    <div class="chart-item">
+                        <h4>Stem Height vs Width by Class</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.scatter_plot }}" alt="Stem Height vs Width Scatter Plot">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.scatter_plot }}</p>
+                    </div>
+                    {% endif %}                    {% if chart_urls.correlation %}
+                    <div class="chart-item">
+                        <h4>Correlation Between Mushroom Dimensions</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.correlation }}" alt="Correlation Heatmap">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.correlation }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if chart_urls.count_cap_shape %}
+                    <div class="chart-item">
+                        <h4>Cap Shape Distribution</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.count_cap_shape }}" alt="Cap Shape Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.count_cap_shape }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if chart_urls.count_cap_color %}
+                    <div class="chart-item">
+                        <h4>Cap Color Distribution</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.count_cap_color }}" alt="Cap Color Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.count_cap_color }}</p>
+                    </div>
+                    {% endif %}                    {% if chart_urls.count_gill_color %}
+                    <div class="chart-item">
+                        <h4>Gill Color Distribution</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.count_gill_color }}" alt="Gill Color Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.count_gill_color }}</p>
+                    </div>
+                    {% endif %}                    {% if chart_urls.cap_color_class %}
+                    <div class="chart-item full-width">
+                        <h4>Cap Color Distribution by Mushroom Class</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.cap_color_class }}" alt="Cap Color by Class Distribution">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.cap_color_class }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if chart_urls.gill_height_box %}
+                    <div class="chart-item full-width">
+                        <h4>Stem Height Distribution by Gill Color</h4>
+                        <div class="chart">
+                            <img src="data:image/png;base64,{{ chart_urls.gill_height_box }}" alt="Stem Height by Gill Color Box Plot">
+                        </div>
+                        <p class="chart-conclusion">{{ conclusions.gill_height_box }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <p class="error">Error: {{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
