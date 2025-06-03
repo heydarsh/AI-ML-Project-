@@ -35,7 +35,7 @@ This Django-based web application enables users to upload mushroom datasets, ana
 
 1. **Clone the repository**
     ```bash
-    git clone https://github.com/heydarsh/mushroom-analysis.git
+    git clone https://https://github.com/heydarsh/AI-ML-Project
     cd mushroom-analysis
     ```
 
